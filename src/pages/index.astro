@@ -1,11 +1,47 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import { sanity } from '../lib/sanityClient';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+type Post = {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  mainImage?: { asset: { url: string } };
+};
+
+const posts: Post[] = await sanity.fetch(`
+  *[_type == "post"]{
+    _id,
+    title,
+    slug,
+    mainImage {
+      asset -> {
+        url
+      }
+    }
+  }
+`);
 ---
 
 <Layout>
-	<Welcome />
+  <main class="p-8 max-w-6xl mx-auto">
+    <h1 class="text-4xl font-bold mb-8">Últimos posts</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {posts.map(post => (
+        <a href={`/posts/${post.slug.current}`} class="block rounded-xl overflow-hidden shadow-md hover:shadow-lg transition">
+          {post.mainImage?.asset?.url && (
+            <img
+              src={post.mainImage.asset.url}
+              alt={post.title}
+              class="w-full h-48 object-cover"
+            />
+          )}
+          <div class="p-4 bg-white">
+            <h2 class="text-xl font-semibold">{post.title}</h2>
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
 </Layout>
