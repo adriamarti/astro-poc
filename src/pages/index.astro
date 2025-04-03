@@ -2,14 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { sanity } from '../lib/sanityClient';
 
-type Post = {
-  _id: string;
-  title: string;
-  slug: { current: string };
-  mainImage?: { asset: { url: string } };
-};
-
-const posts: Post[] = await sanity.fetch(`
+const originalPosts = await sanity.fetch(`
   *[_type == "post"]{
     _id,
     title,
@@ -21,6 +14,10 @@ const posts: Post[] = await sanity.fetch(`
     }
   }
 `);
+
+const posts = Array(100)
+  .fill(null)
+  .flatMap(() => originalPosts);
 ---
 
 <Layout>
