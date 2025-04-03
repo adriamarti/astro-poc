@@ -34,8 +34,11 @@ if (!post) {
 
     {post.mainImage?.asset?.url && (
       <img
-        src={post.mainImage.asset.url}
+        src={`${post.mainImage.asset.url}?auto=format&fit=max&w=800`}
+        width="800"
+        height="400"
         alt={post.title}
+        loading="lazy"
         class="w-full h-64 object-cover rounded-xl mb-6"
       />
     )}
