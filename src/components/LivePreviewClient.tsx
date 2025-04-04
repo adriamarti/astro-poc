@@ -11,31 +11,39 @@ type Post = {
 
 export default function LivePreviewClient() {
   const [post, setPost] = useState<Post | null>(null);
-  const [slug, setSlug] = useState<string | null>(null);
 
   useEffect(() => {
     enableVisualEditing();
 
-    const urlSlug = new URLSearchParams(window.location.search).get('slug');
-    if (!urlSlug) return;
+    const slug = new URLSearchParams(window.location.search).get('slug');
+    if (!slug) return;
 
-    setSlug(urlSlug);
-
-    const subscription = sanity
-      .listen(`*[_type == "post" && slug.current == $slug][0]`, {
-        slug: urlSlug,
-      })
-      .subscribe((update: any) => {
-        if (update.result) {
-          setPost(update.result as Post);
-        }
+    const sub = sanity
+      .listen(`*[_type == "post" && slug.current == $slug][0]._rev`, { slug })
+      .subscribe(() => {
+        // Re-fetch full data with asset URL
+        sanity
+          .fetch(
+            `*[_type == "post" && slug.current == $slug][0]{
+          title,
+          body,
+          mainImage {
+            asset -> {
+              url
+            }
+          }
+        }`,
+            { slug }
+          )
+          .then((data) => {
+            setPost(data as Post);
+          });
       });
 
-    return () => subscription.unsubscribe();
+    return () => sub.unsubscribe();
   }, []);
 
-  if (!slug) return <p className='p-8'>No slug provided.</p>;
-  if (!post) return <p className='p-8'>Loading preview...</p>;
+  if (!post) return <p>Loading preview...</p>;
 
   const htmlBody = post.body ? renderPortableText(post.body) : '';
 
@@ -45,16 +53,16 @@ export default function LivePreviewClient() {
 
       {post.mainImage?.asset?.url && (
         <img
-          src={post.mainImage.asset.url}
+          src={`${post.mainImage.asset.url}?auto=format&fit=max&w=800`}
+          width='800'
+          height='400'
           alt={post.title}
+          loading='lazy'
           className='w-full h-64 object-cover rounded-xl mb-6'
         />
       )}
 
-      <article
-        className='prose prose-lg max-w-none'
-        dangerouslySetInnerHTML={{ __html: htmlBody }}
-      />
+      <article dangerouslySetInnerHTML={{ __html: htmlBody }} />
     </main>
   );
 }

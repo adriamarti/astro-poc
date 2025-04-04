@@ -1,5 +1,20 @@
 ---
-import LivePreview from '../components/LivePreviewClient.tsx';
+import "../styles/global.css";
+import LivePreviewClient from "../components/LivePreviewClient.tsx";
 ---
 
-<LivePreview client:load />
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Preview</title>
+  </head>
+  <body class="bg-white text-gray-800">
+    <header class="border-b p-4">
+      <div class="text-xl font-bold">🔍 Visual Preview</div>
+    </header>
+
+    <main class="prose prose-lg max-w-3xl mx-auto p-8">
+      <LivePreviewClient client:load />
+    </main>
+  </body>
+</html>
