@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@astrojs/react": "^4.2.3",
+    "@portabletext/to-html": "^2.0.14",
     "@sanity/client": "^6.28.4",
     "@tailwindcss/postcss": "^4.1.2",
     "@tailwindcss/vite": "^4.1.2",
