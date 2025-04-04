@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import LiveGraphQLClient from '../components/LiveGraphQLClient.tsx';
 import { sanity } from '../lib/sanityClient';
 
 const originalPosts = await sanity.fetch(`
@@ -22,6 +23,7 @@ const posts = Array(100)
 
 <Layout>
   <main class="p-8 max-w-6xl mx-auto">
+    <LiveGraphQLClient client:load />
     <h1 class="text-4xl font-bold mb-8">Últimos posts</h1>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
